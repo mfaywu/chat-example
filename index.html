@@ -23,8 +23,9 @@
     <script>
       var socket = io();
 
+      console.log(socket.io.engine.id);
       
-      socket.emit('connected message', 'new id!');
+      socket.emit('connected message', socket.io.engine.id);
       
 
       $('form').submit(function(){

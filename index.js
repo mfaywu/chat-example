@@ -11,7 +11,8 @@ io.on('connection', function(socket) {
 	//socket.broadcast.emit('chat message', ' connected');
 	
 	socket.on('connected message', function(msg) {
-		socket.broadcast.emit('chat message', msg);
+		console.log('socket.id is ' + msg);
+		socket.broadcast.emit('chat message', msg + ' is connected!');
 	    });
 
 	socket.on('chat message', function(msg) {
