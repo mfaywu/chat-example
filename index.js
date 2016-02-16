@@ -6,15 +6,17 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
     });
 
-io.on('connection', function(socket) { 
+var clients = [];
 
-	var username;
+io.on('connection', function(socket) { 
+	var client = {username: null, id: null};
 	
 	socket.on('connected message', function(msg) {
-		username = socket.id;
-		console.log('client ' + username + ' has connected');
-		socket.broadcast.emit('chat message', username + ' is connected!');
+		client.username = socket.id;
+		client.id = socket.id;
+		socket.broadcast.emit('chat message', client.username + ' is connected!');
 		socket.emit('chat message', 'You have joined the chat channel!');
+		clients.push(client);
 	    });
 
 	socket.on('chat message', function(msg) {
@@ -23,29 +25,39 @@ io.on('connection', function(socket) {
 		    var cmd = msg.substring(1, pos);
 		    switch (cmd) {
 		    case "username":
-			var prev_username = username;
-			username = msg.substring(11, msg.length);
-			socket.broadcast.emit('chat message', prev_username + ' changed their username to ' + username);
-			socket.emit('chat message', 'You have changed your username to: ' + username);
+			var prev_username = client.username;
+			client.username = msg.substring(11, msg.length);
+			//TODO: if (username doesn't exist already), else don't allow
+			socket.broadcast.emit('chat message', prev_username + ' changed their username to ' + client.username);
+			socket.emit('chat message', 'You have changed your username to: ' + client.username);
 			break;
 		    case "sendto":
 			var sub_msg = msg.substring(pos+2, msg.length);
-			var pos1 = newmsg.indexOf(' ');
+			var pos1 = sub_msg.indexOf(' ');
 			var receiver = sub_msg.substring(0, pos1);
-			//			socket.broadcast.to(receiver).emit('chat message', 
-			break;
+			var receiver_client = clients.filter(function(person) {return person.username.toLowerCase() == receiver.toLowerCase();})[0];
+			if (receiver_client) {
+			    var text_msg = sub_msg.substring(receiver.length+1, sub_msg.length);
+			    var receiver_id = receiver_client.id;
+			    socket.broadcast.to(receiver_id).emit('chat message', 'PM ' + client.username + ': ' + text_msg);
+			    socket.emit('chat message', 'PM You to ' + receiver_client.username + ': ' + text_msg);
+			}
+			else {
+			    socket.emit('chat message', receiver_client + ' is not in this chat channel.');
+			}
+		        break;
 		    default:
 			socket.emit('chat message', 'Invalid command.');
 			break;
 		    }
 		} else {
 		 	 socket.emit('chat message', 'You: ' + msg);
-			 socket.broadcast.emit('chat message', username + ': ' + msg);
+			 socket.broadcast.emit('chat message', client.username + ': ' + msg);
 		}
 	    });
 	socket.on('disconnect', function(msg) {
-		//console.log('user disconnected');
-		io.emit('chat message', 'user disconnected');
+		clients.splice(clients.indexOf(client), 1);
+		io.emit('chat message', client.username + ' disconnected');
 	    });
     });
 
