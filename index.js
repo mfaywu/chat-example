@@ -39,7 +39,8 @@ io.on('connection', function(socket) {
 			break;
 		    }
 		} else {
-		 	 io.emit('chat message', msg);
+		 	 socket.emit('chat message', 'You: ' + msg);
+			 socket.broadcast.emit('chat message', username + ': ' + msg);
 		}
 	    });
 	socket.on('disconnect', function(msg) {
