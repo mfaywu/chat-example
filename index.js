@@ -16,6 +16,7 @@ io.on('connection', function(socket) {
 		client.id = socket.id;
 		socket.broadcast.emit('chat message', client.username + ' is connected!');
 		socket.emit('chat message', 'You have joined the chat channel!');
+		socket.emit('chat message', 'Enter /help: to see a list of the possible commands.');
 		clients.push(client);
 	    });
 
@@ -24,6 +25,12 @@ io.on('connection', function(socket) {
 		    var pos = msg.indexOf(":");
 		    var cmd = msg.substring(1, pos);
 		    switch (cmd) {
+		    case "help":
+			socket.emit('chat message', 'Here are possible commands:');
+			socket.emit('chat message', '/username: <name> to change your username');
+			socket.emit('chat message', '/sendto: <username> <message> to send a private message to someone');
+			socket.emit('chat message', '/whois: to see who is online');
+			break;
 		    case "username":
 			var prev_username = client.username;
 			var new_username = msg.substring(11, msg.length);
@@ -57,6 +64,13 @@ io.on('connection', function(socket) {
 			    socket.emit('chat message', receiver_client + ' is not in this chat channel.');
 			}
 		        break;
+		    case "whois":
+			socket.emit('chat message', 'People available online now: ');
+			var index;
+			for (index = 0; index < clients.length; index++) {
+			    socket.emit('chat message', clients[index].username);
+			}
+			break;
 		    default:
 			socket.emit('chat message', 'Invalid command.');
 			break;
