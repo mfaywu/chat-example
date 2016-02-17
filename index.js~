@@ -16,7 +16,7 @@ io.on('connection', function(socket) {
 		client.id = socket.id;
 		socket.broadcast.emit('chat message', client.username + ' is connected!');
 		socket.emit('chat message', 'You have joined the chat channel!');
-p		clients.push(client);
+		clients.push(client);
 	    });
 
 	socket.on('chat message', function(msg) {

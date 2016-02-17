@@ -12,7 +12,7 @@ io.on('connection', function(socket) {
 	var client = {username: null, id: null};
 	
 	socket.on('connected message', function(msg) {
-		client.username = socket.id;
+		client.username = 'NoName';
 		client.id = socket.id;
 		socket.broadcast.emit('chat message', client.username + ' is connected!');
 		socket.emit('chat message', 'You have joined the chat channel!');
@@ -26,10 +26,21 @@ io.on('connection', function(socket) {
 		    switch (cmd) {
 		    case "username":
 			var prev_username = client.username;
-			client.username = msg.substring(11, msg.length);
-			//TODO: if (username doesn't exist already), else don't allow
-			socket.broadcast.emit('chat message', prev_username + ' changed their username to ' + client.username);
-			socket.emit('chat message', 'You have changed your username to: ' + client.username);
+			var new_username = msg.substring(11, msg.length);
+			if (prev_username == new_username) {
+			    socket.emit('chat message', 'You are already ' + prev_username);
+			}
+			else {
+			    var existing_client = clients.filter(function(person) {return person.username.toLowerCase() == new_username.toLowerCase();})[0];
+			    if (existing_client) {
+				socket.emit('chat message', new_username + ' is already taken. Please choose a different username.');
+			    }
+			    else {
+				client.username = new_username;
+				socket.broadcast.emit('chat message', prev_username + ' changed their username to ' + client.username);
+				socket.emit('chat message', 'You have changed your username to: ' + client.username);
+			    }
+			}
 			break;
 		    case "sendto":
 			var sub_msg = msg.substring(pos+2, msg.length);
