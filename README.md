@@ -4,10 +4,9 @@ I followed the Socket.IO chat example http://socket.io/get-started/chat/ and am 
 implementing the list of ideas at the bottom of the webpage to practice and have some fun. 
 
 ## Features
-[ ] Broadcast a message to connected users when someone connects or disconnects  
-[ ] Add support for nicknames  
-[ ] Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.  
+[x] Broadcast a message to connected users when someone connects or disconnects  
+[x] Add support for nicknames  
+[x] Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.  
 [ ] Add “{user} is typing” functionality  
-[ ] Show who’s online  
-[ ] Add private messaging  
-[ ] Share your improvements!  
+[x] Show who’s online  
+[x] Add private messaging  
